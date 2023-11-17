@@ -1,6 +1,6 @@
 if getgenv().m_cons then
-	for i = 1, #getgenv().m_cons do
-		getgenv().m_cons[i]:Disconnect()
+	for i,v in next, getgenv().m_cons do
+		v:Disconnect()
 	end
 end
 getgenv().m_cons = {}
