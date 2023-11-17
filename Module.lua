@@ -100,14 +100,14 @@ end;Events.OnTradeUpdated(false)
 
 Events.OnTradeCompleted = function(callback)
 	getgenv().m_cons[#getgenv().m_cons+1] = Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
-		if Accepted then
+		if Accept then
 			callback(MyOffer, Items, CurrentTrader)
 		end
 	end)
 end
 Events.OnTradeAccepted = function(callback)
 	getgenv().m_cons[#getgenv().m_cons+1] = Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
-		if not Accepted then
+		if not Accept then
 			callback(TheirOffer, CurrentTrader)
 		end
 	end)
