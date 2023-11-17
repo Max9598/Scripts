@@ -49,6 +49,7 @@ Events.OnRequest = function(callback)
 			callback(Player)
 			task.wait()
 			is_accepting = false
+			return true
 		end
 		return false
 	end
