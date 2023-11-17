@@ -140,4 +140,10 @@ Events.OnTradeAccepted = function(callback)
 	end)
 end
 
+vu=game:GetService("VirtualUser")
+LP.Idled:Connect(function()
+    vu:CaptureController()
+    vu:ClickButton2(Vector2.new())
+end)
+
 return {["Events"] = Events, ["Functions"] = Functions, ["ItemsTable"] = ItemsTable}
