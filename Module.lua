@@ -71,6 +71,7 @@ Events.OnTradeStarted = function(callback)
 			Functions.DeclineTrade()
 			return
 		end
+		CurrentTrader = Player
 		callback(Player)
 	end)
 end
