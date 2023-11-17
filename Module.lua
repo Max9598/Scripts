@@ -1,4 +1,4 @@
-if #getgenv().m_cons>0 then
+if getgenv().m_cons then
 	for i = 1, #getgenv().m_cons do
 		getgenv().m_cons[i]:Disconnect()
 	end
