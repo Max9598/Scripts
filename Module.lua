@@ -1,3 +1,10 @@
+if #getgenv().m_cons>0 then
+	for i = 1, #getgenv().m_cons do
+		getgenv().m_cons[i]:Disconnect()
+	end
+end
+getgenv().m_cons = {}
+
 local Trade = RS.Trade
 local Functions = {}
 local Events = {}
@@ -59,8 +66,8 @@ local CurrentTrader = LP
 local MyOffer = {}
 local TheirOffer = {}
 Events.OnTradeStarted = function(callback)
-	Trade.StartTrade.OnClientEvent:connect(function(_,Player)
-		if CurrentTrader ~= PL[Player] then
+	getgenv().m_cons[#getgenv().m_cons+1] = Trade.StartTrade.OnClientEvent:connect(function(_,Player)
+		if not PL[Player] then
 			Functions.DeclineTrade()
 			return
 		end
@@ -68,7 +75,7 @@ Events.OnTradeStarted = function(callback)
 	end)
 end
 Events.OnTradeUpdated = function(callback)
-	Trade.UpdateTrade.OnClientEvent:connect(function(trade)
+	getgenv().m_cons[#getgenv().m_cons+1] = Trade.UpdateTrade.OnClientEvent:connect(function(trade)
 		if callback then
 			callback(trade)
 		end
@@ -89,15 +96,16 @@ Events.OnTradeUpdated = function(callback)
 		end
 	end)
 end;Events.OnTradeUpdated(false)
+
 Events.OnTradeCompleted = function(callback)
-	Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
+	getgenv().m_cons[#getgenv().m_cons+1] = Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
 		if Accepted then
 			callback(MyOffer, Items, CurrentTrader)
 		end
 	end)
 end
 Events.OnTradeAccepted = function(callback)
-	Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
+	getgenv().m_cons[#getgenv().m_cons+1] = Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
 		if not Accepted then
 			callback(TheirOffer, CurrentTrader)
 		end
