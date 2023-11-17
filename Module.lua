@@ -16,28 +16,29 @@ Functions.DeclineTrade = function()
 end
 
 Functions.JsonDecode = function(...)
-	local success, response = pcall(HS:JSONDecode, ...)
+	local success, response = pcall(function(...) return HS:JSONDecode(...) end, ...)
 	if success then
 		return response
 	else
 		warn("Json decoding failed, error:", response)
-	eend
+	end
 end
 Functions.JsonEncode = function(...)
-	local success, response = pcall(HS:JSONEncode, ...)
+	local success, response = pcall(function(...) return HS:JSONEncode(...) end, ...)
 	if success then
 		return response
 	else
 		warn("Json encoding failed, error:", response)
-	eend
+	end
 end
+print(Functions.JsonEncode({["a"] = "dd"}))
 Functions.Request = function(...)
 	local success, response = pcall(request, ...)
 	if success and response.StatusCode == 200 then
 		return response
 	else
 		warn("Request failed, error:", response.StatusCode and response.StatusCode or response)
-	eend
+	end
 end
 
 local is_accepting = false
