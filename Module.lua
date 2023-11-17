@@ -5,10 +5,37 @@ if getgenv().m_cons then
 end
 getgenv().m_cons = {}
 
+local MsgReq = RS.DefaultChatSystemChatEvents.SayMessageRequest
 local Trade = RS.Trade
 local Functions = {}
 local Events = {}
+local ItemsTable = {}
 
+local Items = RS.GetSyncData:InvokeServer()
+for GameName,Info in next, Items.Item do
+	ItemsTable[GameName] = {Type = Info.ItemType, Rarity = Info.Rarity, Category = "Weapons", Name = Info.ItemName, Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]}
+end;ItemsTable.Ghosty = nil
+for GameName,Info in next, Items.Pets do
+	ItemsTable[GameName] = {Type = "Pet", Rarity = Info.Rarity, Category = "Pets", Name = Info.Name, Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]}
+end
+task.spawn(function()
+	while task.wait(5) do
+		INV = RS.Remotes.Extras.GetData2:InvokeServer()
+	end
+end)
+
+Functions.Message = function(Text)
+	MsgReq:FireServer(Text, 'normalchat')
+end
+
+Functions.TradeAdd = function(Item, Count)
+	local inv_item = INV[ItemsTable[Item].Category].Owned[Item] or 0
+	if inv_item >= Count then
+		for i = 1, Count do
+			Trade.OfferItem:FireServer(Item, ItemsTable[Item].Category)
+		end
+	end
+end
 Functions.AcceptRequest = function()
 	Trade.AcceptRequest:FireServer()
 end
@@ -113,4 +140,4 @@ Events.OnTradeAccepted = function(callback)
 	end)
 end
 
-return {["Events"] = Events, ["Functions"] = Functions}
+return {["Events"] = Events, ["Functions"] = Functions, ["ItemsTable"] = ItemsTable}
