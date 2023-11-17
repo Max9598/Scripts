@@ -46,7 +46,7 @@ Events.OnRequest = function(callback)
 	Trade.SendRequest.OnClientInvoke = function(Player)
 		if not is_accepting then
 			is_accepting = true
-			callback(Player)
+			spawn(callback, Player)
 			task.wait()
 			is_accepting = false
 			return true
