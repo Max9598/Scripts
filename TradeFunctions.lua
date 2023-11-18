@@ -42,4 +42,4 @@ Functions.BotInventory = function()
 	return INV
 end
 
-return {["Functions"] = Functions, ["ItemsTable"] = ItemsTable, ["BotInventory"] = BotInventory}
+return {["Functions"] = Functions, ["ItemsTable"] = ItemsTable}
