@@ -5,11 +5,25 @@ local INV = {}
 
 local Items = RS.GetSyncData:InvokeServer()
 for GameName,Info in next, Items.Item do
-	ItemsTable[GameName] = {Type = Info.ItemType, Rarity = Info.Rarity, Category = "Weapons", Name = Info.ItemName, Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]}
-end;ItemsTable.Ghosty = nil
-for GameName,Info in next, Items.Pets do
-	ItemsTable[GameName] = {Type = "Pet", Rarity = Info.Rarity, Category = "Pets", Name = Info.Name, Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]}
+	ItemsTable[GameName] = {
+		Type = Info.ItemType,
+		Rarity = Info.Rarity,
+		Category = "Weapons",
+		Name = Info.ItemName,
+		Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]
+	}
 end
+ItemsTable.Ghosty = nil
+for GameName,Info in next, Items.Pets do
+	ItemsTable[GameName] = {
+		Type = "Pet",
+		Rarity = Info.Rarity,
+		Category = "Pets",
+		Name = Info.Name,
+		Id = tonumber(Info.Image) and Info.Image or string.find(Info.Image, "http") and string.split(Info.Image, "d=")[2] or string.split(Info.Image, "//")[2]
+	}
+end
+
 task.spawn(function()
 	while task.wait(5) do
 		INV = RS.Remotes.Extras.GetData2:InvokeServer()
