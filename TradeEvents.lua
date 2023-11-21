@@ -36,6 +36,13 @@ Events.OnTradeStarted = function(callback)
 		callback(Player)
 	end)
 end
+
+Events.OnTradeDeclined = function(callback)
+	m_cons[#m_cons+1] = Trade.DeclineTrade.OnClientEvent:connect(function()
+		callback(CurrentTrader)
+	end)
+end
+
 Events.OnTradeUpdated = function(callback)
 	m_cons[#m_cons+1] = Trade.UpdateTrade.OnClientEvent:connect(function(trade)
 		if callback then
