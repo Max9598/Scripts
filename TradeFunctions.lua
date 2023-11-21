@@ -30,13 +30,12 @@ task.spawn(function()
 	end
 end)
 
-Functions.TradeAdd = function(Item, Count)
+Functions.TradeAdd = function(Item, Count, All)
 	local inv_item = INV[ItemsTable[Item].Category].Owned[Item] or 0
-	if inv_item >= Count then
-		for i = 1, Count do
-			Trade.OfferItem:FireServer(Item, ItemsTable[Item].Category)
-		end
-	else
+	for i = 1, (inv_item >= Count and Count or All and inv_item or 0) do
+		Trade.OfferItem:FireServer(Item, ItemsTable[Item].Category)
+	end
+	if not All and inv_item<Count then
 		warn(Item.." Amount is less than "..Count)
 	end
 end
