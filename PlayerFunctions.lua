@@ -1,3 +1,8 @@
+getgenv().RS = game:GetService("ReplicatedStorage")
+getgenv().HS = game:GetService("HttpService")
+getgenv().PL = game:GetService("Players")
+getgenv().LP = PL.LocalPlayer
+
 local MsgReq = RS.DefaultChatSystemChatEvents.SayMessageRequest
 local Functions = {}
 
