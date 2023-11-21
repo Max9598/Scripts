@@ -1,4 +1,5 @@
 if getgenv().m_cons then
+	print("Disconnected",#getgenv().m_cons,"connections")
 	for i,v in next, getgenv().m_cons do
 		v:Disconnect()
 	end
