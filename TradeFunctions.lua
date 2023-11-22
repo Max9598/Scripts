@@ -24,6 +24,7 @@ for GameName,Info in next, Items.Pets do
 	}
 end
 
+INV = RS.Remotes.Extras.GetData2:InvokeServer()
 task.spawn(function()
 	while task.wait(5) do
 		INV = RS.Remotes.Extras.GetData2:InvokeServer()
