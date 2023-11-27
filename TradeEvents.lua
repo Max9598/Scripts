@@ -76,7 +76,7 @@ end
 Events.OnTradeAccepted = function(callback)
 	m_cons[#m_cons+1] = Trade.AcceptTrade.OnClientEvent:connect(function(Accept, Items)
 		if not Accept then
-			callback(TheirOffer, CurrentTrader)
+			callback(TheirOffer, CurrentTrader, MyOffer)
 		end
 	end)
 end
