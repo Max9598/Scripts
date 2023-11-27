@@ -37,8 +37,9 @@ Functions.TradeAdd = function(Item, Count, All)
 		Trade.OfferItem:FireServer(Item, ItemsTable[Item].Category)
 	end
 	if not All and inv_item<Count then
-		warn(Item.." Amount is less than "..Count)
+		return false
 	end
+	return true
 end
 Functions.AcceptRequest = function()
 	Trade.AcceptRequest:FireServer()
