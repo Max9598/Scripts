@@ -6,8 +6,13 @@ getgenv().LP = PL.LocalPlayer
 local MsgReq = RS.DefaultChatSystemChatEvents.SayMessageRequest
 local Functions = {}
 
-Functions.Message = function(Text)
-	MsgReq:FireServer(Text, 'normalchat')
+Functions.Message = function(Text, Arg)
+	if Text then
+		if string.find(Text, "$") then
+			Text = string.gsub(Text, "$", Arg)
+		end
+		MsgReq:FireServer(Text, 'normalchat')
+	end
 end
 
 Functions.JsonDecode = function(...)
