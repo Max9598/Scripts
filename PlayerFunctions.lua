@@ -8,7 +8,7 @@ local Functions = {}
 
 Functions.Message = function(Text, Arg)
 	if Text then
-		MsgReq:FireServer(Text:gsub("%$", Arg), 'normalchat')
+		MsgReq:FireServer(string.find(Text, "$") and Text:gsub("%$", Arg) or Text, 'normalchat')
 	end
 end
 
