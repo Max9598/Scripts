@@ -35,7 +35,7 @@ local function get_order(Nickname)
 		    print'plr is nikname'
                     local items = {}
                     for kk,zz in next, v.line_items do
-			if not table.find(CompletedList[Nickname], zz.id) then
+			if CompletedList[Nickname] and not table.find(CompletedList[Nickname], zz.id) then
                         	items[#items+1] = {["Name"] = zz.sku, ["Amount"] = zz.quantity, ["Id"] = zz.id}
 			end
                     end
