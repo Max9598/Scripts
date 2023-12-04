@@ -120,16 +120,15 @@ TradeEvents.OnTradeStarted(function(Player)
 end)
 
 TradeEvents.OnTradeAccepted(function(TheirOffer, CurrentTrader, MyOffer)
-	for i,v in next, MyOffer do
-		print(v[1])
-	end
 	if #WithdrawInfo.items <= 4 then
 		if #MyOffer==#WithdrawInfo.items then
 			TradeFunctions.AcceptTrade()
+		else
+			TradeFunctions.DeclineTrade()
+			warn("Unknown Error")
 		end
 	else
-		TradeFunctions.DeclineTrade()
-		warn("Unknown Error")
+		TradeFunctions.AcceptTrade()
 	end
 end)
 
