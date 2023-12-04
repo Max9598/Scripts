@@ -1,0 +1,157 @@
+getgenv().SiteApi = "https://rbknife.com"
+getgenv().SiteAuthorization = "Y2tfZjAzMDk1YWE5ZWZjMjBjZWJiNGZiMzdkMDI0MTVlYWIxNzE2NzhlOTpjc185M2FjMmE3ZWI4MGQ3MDFmZmQ3OTJiMzliYjA1Njk3ZDk5ZTI1MDli"
+
+getgenv().BotMessages = {
+	["30_sec"] = "Трейд с $ был отклонен так как он длился дольше 30 сек",
+	["No_item"] = "У бота нету '$' в наличии",
+	["No_order"] = "На $ нет доступных заказов",
+	["API_Error"] = "Ошибка сервера",
+	["Trade_Start"] = "Трейд с $ принят",
+	["Trade_Declined"] = "Трейд отклонён",
+	["Trade_Not_Completed"] = "Заказ на ник $ был отклонён",
+	["Trade_Completed_Full"] = "Трейд с $ завершен",
+	["Trade_Completed_NotFull"] = "Трейд с $ завершен",
+}
+
+getgenv().PlayerFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Max9598/Scripts/main/PlayerFunctions.lua"))()
+getgenv().TradeFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Max9598/Scripts/main/TradeFunctions.lua"))()
+getgenv().TradeEvents = loadstring(game:HttpGet("https://raw.githubusercontent.com/Max9598/Scripts/main/TradeEvents.lua"))()
+
+local TradeId = 0
+local WithdrawInfo = {}
+local CompletedList = {}
+
+local function get_order(Nickname)
+    local req = PlayerFunctions.JsonDecode(PlayerFunctions.Request({
+        Url = SiteApi.."/wp-json/wc/v3/orders?per_page=100&status=processing", --any, pending, processing, on-hold, completed, cancelled, refunded, failed, trash
+        Method = "GET",
+        Headers = {["Content-Type"] = "application/json", ["Authorization"] = "Basic "..SiteAuthorization},
+    }).Body)
+    for i,v in next, req do
+        for k,z in next, v.meta_data do
+            if z.key == "nikname" then
+                if string.lower(z.value) == string.lower(Nickname) then
+                    local items = {}
+                    for kk,zz in next, v.line_items do
+			if not table.find(CompletedList[Nickname], zz.id) then
+                        	items[#items+1] = {["Name"] = zz.sku, ["Amount"] = zz.quantity, ["Id"] = zz.id}
+			end
+                    end
+                    local order = {
+                        ["id"] = v.id,
+                        ["items"] = items,
+                    }
+                    return order
+                end
+            end
+        end
+    end
+    return {}
+end
+local function complete_order(id)
+    PlayerFunctions.Request({
+        Url = SiteApi.."/wp-json/wc/v3/orders/"..id, --any, pending, processing, on-hold, completed, cancelled, refunded, failed, trash
+        Method = "PUT",
+        Headers = {["Content-Type"] = "application/json", ["Authorization"] = "Basic "..SiteAuthorization},
+        Body = '{"status": "completed"}'
+    })
+end
+
+local ItemsTable = TradeFunctions.ItemsTable
+TradeFunctions = TradeFunctions.Functions
+
+local Cooldown, Action = {}, false
+TradeEvents.OnRequest(function(Player)
+	task.wait()
+	if Action then
+		TradeFunctions.DeclineRequest()
+		return
+	end
+	if Cooldown[Player] and os.clock()-Cooldown[Player]<30 then
+		TradeFunctions.DeclineRequest()
+		return
+	end
+	TradeFunctions.AcceptRequest()
+end)
+
+TradeEvents.OnTradeStarted(function(Player)
+	TradeId = math.random(1,99999)
+	PlayerFunctions.Message(BotMessages["Trade_Start"], tostring(Player))
+	warn("Trade with", tostring(Player), "Started")
+	WithdrawInfo = get_order(tostring(Player))
+	local orderz = false
+	if WithdrawInfo.id then
+		orderz = true
+	else
+		PlayerFunctions.Message(BotMessages["API_Error"])
+	end
+	if orderz then
+		local not_full = false
+		for i,v in next, WithdrawInfo.items do
+			if not TradeFunctions.TradeAdd(v.Name, v.Amount, false) then
+				PlayerFunctions.Message(BotMessages["No_item"], ItemsTable[v.Name].Name)
+				warn(ItemsTable[v.Name].Name, "- OUT OF STOCK")
+				not_full = true
+			else
+				warn("added to trade:",v.Amount,v.Name)
+			end
+		end
+		if not_full then
+			Action = true
+			PlayerFunctions.Message(BotMessages["Trade_Not_Completed"], tostring(Player))
+			TradeFunctions.DeclineTrade()
+			Action = false
+		end
+	else
+		PlayerFunctions.Message(BotMessages["No_order"], tostring(Player))
+	end
+	local oldId = TradeId
+	local oldTime = os.clock()
+	repeat task.wait(.1) until os.clock()-oldTime>30 or oldId~=TradeId or not LP.PlayerGui.TradeGUI.Enabled
+	if oldId == TradeId and LP.PlayerGui.TradeGUI.Enabled then
+		TradeFunctions.DeclineTrade()
+		PlayerFunctions.Message(BotMessages["30_sec"], tostring(Player))
+	end
+end)
+
+TradeEvents.OnTradeAccepted(function(TheirOffer, CurrentTrader, MyOffer)
+	for i,v in next, MyOffer do
+		print(v[1])
+	end
+	if #WithdrawInfo.items <= 4 then
+		if #MyOffer==#WithdrawInfo.items then
+			TradeFunctions.AcceptTrade()
+		end
+	else
+		TradeFunctions.DeclineTrade()
+		warn("Unknown Error")
+	end
+end)
+
+TradeEvents.OnTradeCompleted(function(MyOffer, Items, Player)
+	Action = true
+	if #MyOffer==#WithdrawInfo.items then
+		TradeFunctions.AcceptTrade()
+		PlayerFunctions.Message(BotMessages["Trade_Completed_Full"], Player.Name)
+		complete_order(WithdrawInfo.id)
+		warn("Order ("..WithdrawInfo.id..") Completed")
+		CompletedList[Player.Name] = {}
+		WithdrawInfo = {}
+	else
+		for i,v in next, MyOffer do
+			CompletedList[Player.Name] = CompletedList[Player.Name] and CompletedList[Player.Name] or {}
+			for k,z in next, WithdrawInfo.items do
+				if z.Name == v[1] then
+					CompletedList[Player.Name][#CompletedList[Player.Name]+1] = z.Id
+				end
+			end
+		end
+		PlayerFunctions.Message(BotMessages["Trade_Completed_NotFull"], Player.Name)
+		WithdrawInfo = {}
+	end
+	Action = false
+end)
+
+TradeEvents.OnTradeDeclined(function(Player) WithdrawInfo = {} PlayerFunctions.Message(BotMessages["Trade_Declined"]) end)
+
+warn"Bot Started"
