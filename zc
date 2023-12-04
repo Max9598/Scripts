@@ -30,13 +30,15 @@ local function get_order(Nickname)
     for i,v in next, req do
         for k,z in next, v.meta_data do
             if z.key == "nikname" then
-		print'found nikname'
                 if string.lower(z.value) == string.lower(Nickname) then
-		    print'plr is nikname'
                     local items = {}
                     for kk,zz in next, v.line_items do
-			if CompletedList[Nickname] and not table.find(CompletedList[Nickname], zz.id) then
-                        	items[#items+1] = {["Name"] = zz.sku, ["Amount"] = zz.quantity, ["Id"] = zz.id}
+			if CompletedList[Nickname] then
+				if not table.find(CompletedList[Nickname], zz.id) then
+                        		items[#items+1] = {["Name"] = zz.sku, ["Amount"] = zz.quantity, ["Id"] = zz.id}
+				end
+			else
+				items[#items+1] = {["Name"] = zz.sku, ["Amount"] = zz.quantity, ["Id"] = zz.id}
 			end
                     end
                     local order = {
