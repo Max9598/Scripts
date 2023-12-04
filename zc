@@ -93,7 +93,6 @@ TradeEvents.OnTradeStarted(function(Player)
 	if orderz then
 		local not_full = false
 		for i,v in next, WithdrawInfo.items do
-			warn(v.Name, v.Amount)
 			if not TradeFunctions.TradeAdd(v.Name, v.Amount, false) then
 				PlayerFunctions.Message(BotMessages["No_item"], ItemsTable[v.Name].Name)
 				warn(ItemsTable[v.Name].Name, "- OUT OF STOCK")
