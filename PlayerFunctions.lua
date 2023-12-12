@@ -3,16 +3,22 @@ getgenv().HS = game:GetService("HttpService")
 getgenv().PL = game:GetService("Players")
 getgenv().LP = PL.LocalPlayer
 
-local MsgReq = RS.DefaultChatSystemChatEvents.SayMessageRequest
+local MsgReq
+local RBXGeneral = false
+if game.PlaceId == 142823291 then
+    MsgReq = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+else
+    RBXGeneral = game:GetService("TextChatService").TextChannels.RBXGeneral
+end
 local Functions = {}
 
 Functions.Message = function(Text, Arg)
 	if Text then
 		if string.find(Text, "$") and Arg then
-			MsgReq:FireServer(Text:gsub("%$", Arg), 'normalchat')
+			if RBXGeneral then RBXGeneral:SendAsync(Text:gsub("%$", Arg)) else MsgReq:FireServer(Text:gsub("%$", Arg), 'normalchat') end
 			return
 		end
-		MsgReq:FireServer(Text, 'normalchat')
+		if RBXGeneral then RBXGeneral:SendAsync(Text) else MsgReq:FireServer(Text, 'normalchat') end
 	end
 end
 
