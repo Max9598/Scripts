@@ -40,7 +40,7 @@ Functions.JsonEncode = function(...)
 end
 Functions.Request = function(...)
 	local success, response = pcall(request, ...)
-	if success and response.StatusCode == 200 then
+	if success and (response.StatusCode == 200 or response.StatusCode == 204) then
 		return response
 	else
 		warn("Request failed, error:", response.StatusCode and response.StatusCode or response)
