@@ -5,8 +5,8 @@ getgenv().LP = PL.LocalPlayer
 
 local MsgReq
 local RBXGeneral = false
-if game.PlaceId == 142823291 then
-    MsgReq = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+if RS:FindFirstChild("DefaultChatSystemChatEvents") then
+    MsgReq = RS.DefaultChatSystemChatEvents.SayMessageRequest
 else
     RBXGeneral = game:GetService("TextChatService").TextChannels.RBXGeneral
 end
